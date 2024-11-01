@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Safari MediaTrack Clone Bug</title>
+    <style>
+        .container { margin: 20px; font-family: Arial, sans-serif; }
+        .status { margin-top: 10px; padding: 10px; border: 1px solid #ccc; }
+        button { margin: 5px; padding: 8px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Safari MediaTrack Clone Bug Reproduction</h2>
+        <button onclick="startTest()">Start Test</button>
+        <button onclick="testClone()">Test Clone</button>
+        <div id="status" class="status">Status: Ready to test</div>
+    </div>
+
+    <script>
+        let originalTrack = null;
+        const statusDiv = document.getElementById('status');
+
+        function updateStatus(message) {
+            statusDiv.innerHTML += `<br>${message}`;
+        }
+
+        async function startTest() {
+            try {
+                // Get audio stream
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                originalTrack = stream.getAudioTracks()[0];
+                
+                // Disable the track
+                originalTrack.enabled = false;
+                
+                // Verify original track state
+                updateStatus(`Original track enabled: ${originalTrack.enabled}`);
+                
+                if (originalTrack.enabled === true) {
+                    updateStatus('❌ ERROR: Original track should be disabled!');
+                } else {
+                    updateStatus('✅ Original track is correctly disabled');
+                }
+            } catch (error) {
+                updateStatus(`Error: ${error.message}`);
+            }
+        }
+
+        function testClone() {
+            if (!originalTrack) {
+                updateStatus('Please start the test first');
+                return;
+            }
+
+            try {
+                // Clone the track
+                const trackClone = originalTrack.clone();
+                
+                updateStatus(`Clone track enabled: ${trackClone.enabled}`);
+                
+                if (trackClone.enabled !== originalTrack.enabled) {
+                    updateStatus('❌ BUG FOUND: Clone track enabled state differs from original!');
+                    updateStatus(`Original: ${originalTrack.enabled}`);
+                    updateStatus(`Clone: ${trackClone.enabled}`);
+                } else {
+                    updateStatus('✅ Clone track enabled state matches original');
+                }
+                
+                // Log additional track info for debugging
+                updateStatus('Original track info:');
+                updateStatus(`- ID: ${originalTrack.id}`);
+                updateStatus(`- Kind: ${originalTrack.kind}`);
+                updateStatus(`- Muted: ${originalTrack.muted}`);
+                
+                updateStatus('Clone track info:');
+                updateStatus(`- ID: ${trackClone.id}`);
+                updateStatus(`- Kind: ${trackClone.kind}`);
+                updateStatus(`- Muted: ${trackClone.muted}`);
+
+                // Clean up
+                trackClone.stop();
+            } catch (error) {
+                updateStatus(`Error during clone test: ${error.message}`);
+            }
+        }
+    </script>
+</body>
+</html>
