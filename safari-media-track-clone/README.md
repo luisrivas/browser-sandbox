@@ -10,3 +10,5 @@ It shows that the cloned track incorrectly has `enabled` set to `true` instead o
 [Demo](https://luisrivas.github.io/browser-sandbox/safari-media-track-clone/index.html)
 
 [Bug report](https://bugs.webkit.org/show_bug.cgi?id=282465)
+
+[Regression' fix on WebKit](https://github.com/WebKit/WebKit/commit/c29f5f0e0f7e949d33dd3457e4e44609a7a7219b)
